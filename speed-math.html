@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>速算挑战</title>
+    <style>
+        /* ===== Base ===== */
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #818CF8;
+            --primary-dark: #3730A3;
+            --success: #10B981;
+            --success-bg: #D1FAE5;
+            --danger: #EF4444;
+            --danger-bg: #FEE2E2;
+            --warning: #F59E0B;
+            --warning-bg: #FEF3C7;
+            --bg: #F1F5F9;
+            --card: #FFFFFF;
+            --text: #1E293B;
+            --text-secondary: #64748B;
+            --border: #E2E8F0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== App Container ===== */
+        #app {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            min-height: 100vh;
+        }
+
+        /* ===== Screens ===== */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Buttons ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg);
+        }
+
+        /* ===== Home Screen ===== */
+        .home-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .home-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .home-header p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--text);
+        }
+
+        /* Type Grid */
+        .type-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .type-card {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .type-card:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow);
+        }
+        .type-card.selected {
+            border-color: var(--primary);
+            background: #EEF2FF;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+        .type-card:last-child:nth-child(odd) {
+            grid-column: 1 / -1;
+            max-width: calc(50% - 6px);
+            justify-self: center;
+        }
+        .type-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .type-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        .type-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Difficulty */
+        .difficulty-section {
+            margin-bottom: 28px;
+        }
+        .difficulty-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .diff-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--card);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .diff-btn:hover {
+            border-color: var(--primary-light);
+        }
+        .diff-btn.selected {
+            border-color: var(--primary);
+            background: #EEF2FF;
+            color: var(--primary);
+        }
+        .difficulty-info {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            min-height: 20px;
+        }
+
+        /* Start Button */
+        .btn-start {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border-radius: var(--radius);
+        }
+        .btn-start:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ===== Quiz Screen ===== */
+        .quiz-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn-back {
+            background: none;
+            border: none;
+            font-size: 15px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-back:hover {
+            background: var(--bg);
+            color: var(--text);
+        }
+        .timer-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .timer-bar-wrapper {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .timer-bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: width 1s linear, background 0.3s;
+        }
+        .timer-bar.warning {
+            background: var(--warning);
+        }
+        .timer-bar.danger {
+            background: var(--danger);
+            animation: pulse 1s infinite;
+        }
+        .timer-bar.overtime {
+            background: var(--danger);
+            width: 100% !important;
+            animation: pulse 0.8s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .timer-text {
+            font-size: 20px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+            color: var(--text);
+        }
+        .timer-text.warning {
+            color: var(--warning);
+        }
+        .timer-text.danger {
+            color: var(--danger);
+        }
+        .timer-text.overtime {
+            color: var(--danger);
+            font-weight: 800;
+        }
+        .progress-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        /* Problem List */
+        .problem-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-bottom: 100px;
+        }
+        .problem-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            transition: all 0.15s;
+        }
+        .problem-row:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .problem-num {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            min-width: 24px;
+            text-align: center;
+        }
+        .problem-expr {
+            font-size: 17px;
+            font-weight: 600;
+            flex: 1;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            letter-spacing: 0.5px;
+        }
+        .problem-input {
+            width: 90px;
+            padding: 8px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            -webkit-appearance: none;
+        }
+        .problem-input:focus {
+            border-color: var(--primary);
+        }
+        .problem-input.input-1 {
+            width: 60px;
+        }
+
+        /* Quiz Footer */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: linear-gradient(to top, var(--bg) 60%, transparent);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+        }
+        .btn-submit {
+            width: 100%;
+            max-width: 640px;
+            padding: 14px 32px;
+            font-size: 17px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* ===== Result Screen ===== */
+        .result-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .result-header h2 {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .score-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .score-main {
+            margin-bottom: 20px;
+        }
+        .score-number {
+            font-size: 56px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+        .score-number.excellent {
+            color: var(--success);
+        }
+        .score-number.poor {
+            color: var(--danger);
+        }
+        .score-main-label {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .score-details {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+        }
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .score-count {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .score-item.correct .score-count {
+            color: var(--success);
+        }
+        .score-item.wrong .score-count {
+            color: var(--danger);
+        }
+        .score-item-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Result Detail */
+        .result-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 24px;
+        }
+        .result-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+        }
+        .result-row.correct {
+            background: var(--success-bg);
+        }
+        .result-row.wrong {
+            background: var(--danger-bg);
+        }
+        .result-num {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            min-width: 24px;
+            text-align: center;
+        }
+        .result-expr {
+            font-weight: 600;
+            flex: 1;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+        }
+        .result-answer {
+            font-weight: 700;
+            min-width: 40px;
+            text-align: center;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+        }
+        .result-row.correct .result-answer {
+            color: var(--success);
+        }
+        .result-row.wrong .result-answer {
+            color: var(--danger);
+            text-decoration: line-through;
+        }
+        .result-correct {
+            font-size: 13px;
+            color: var(--danger);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .result-icon {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .result-row.correct .result-icon {
+            color: var(--success);
+        }
+
+        /* Result Actions */
+        .result-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .result-actions .btn {
+            flex: 1;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: var(--radius);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 480px) {
+            #app {
+                padding: 16px 12px;
+            }
+            .home-header h1 {
+                font-size: 26px;
+            }
+            .type-grid {
+                gap: 8px;
+            }
+            .type-card {
+                padding: 14px 10px;
+            }
+            .type-icon {
+                font-size: 26px;
+            }
+            .type-name {
+                font-size: 13px;
+            }
+            .problem-expr {
+                font-size: 15px;
+            }
+            .problem-input {
+                width: 75px;
+                font-size: 15px;
+            }
+            .problem-input.input-1 {
+                width: 50px;
+            }
+            .score-number {
+                font-size: 44px;
+            }
+        }
+
+        /* ===== Celebration ===== */
+        .celebration {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- ===== Home Screen ===== -->
+        <div id="home-screen" class="screen active">
+            <div class="home-header">
+                <h1>速算挑战</h1>
+                <p>选择题型和难度，挑战你的计算速度</p>
+            </div>
+
+            <div class="section-title">选择题型</div>
+            <div class="type-grid" id="type-grid"></div>
+
+            <div class="difficulty-section">
+                <div class="section-title">选择难度</div>
+                <div class="difficulty-buttons" id="difficulty-buttons"></div>
+                <div class="difficulty-info" id="difficulty-info">请选择题型查看题目信息</div>
+            </div>
+
+            <button class="btn btn-primary btn-start" id="btn-start" disabled>
+                开始挑战
+            </button>
+        </div>
+
+        <!-- ===== Quiz Screen ===== -->
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <button class="btn-back" id="btn-back">← 返回</button>
+                <div class="timer-container">
+                    <div class="timer-bar-wrapper">
+                        <div class="timer-bar" id="timer-bar"></div>
+                    </div>
+                    <div class="timer-text" id="timer-text">00:00</div>
+                </div>
+                <div class="progress-text" id="progress-text">0/0</div>
+            </div>
+            <div class="problem-list" id="problem-list"></div>
+            <div class="quiz-footer">
+                <button class="btn btn-primary btn-submit" id="btn-submit">提交答卷</button>
+            </div>
+        </div>
+
+        <!-- ===== Result Screen ===== -->
+        <div id="result-screen" class="screen">
+            <div class="result-header">
+                <h2>挑战结果</h2>
+            </div>
+            <div class="score-card" id="score-card"></div>
+            <div class="result-detail" id="result-detail"></div>
+            <div class="result-actions">
+                <button class="btn btn-secondary" id="btn-retry">再来一次</button>
+                <button class="btn btn-primary" id="btn-home">返回首页</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ===== Constants ===== */
+        const TYPES = [
+            { id: 1, name: '两位数×一位数', icon: '✖️', desc: '验证运算结果', inputClass: '' },
+            { id: 2, name: '两位数加减两位数', icon: '➕', desc: '结果含正负值', inputClass: '' },
+            { id: 3, name: '三位数加减三位数', icon: '🔢', desc: '结果含正负值', inputClass: '' },
+            { id: 4, name: '五位数÷两位数', icon: '➗', desc: '验证商首位', inputClass: 'input-1' },
+            { id: 5, name: '五位数÷三位数', icon: '🧮', desc: '验证商前两位', inputClass: '' },
+        ];
+
+        const DIFFICULTIES = {
+            1: {
+                easy:   { count: 20, time: 120, label: '简单' },
+                normal: { count: 40, time: 90,  label: '普通' },
+                hard:   { count: 60, time: 60,  label: '困难' },
+            },
+            2: {
+                easy:   { count: 10, time: 150, label: '简单' },
+                normal: { count: 20, time: 120, label: '普通' },
+                hard:   { count: 30, time: 90,  label: '困难' },
+            },
+            3: {
+                easy:   { count: 10, time: 210, label: '简单' },
+                normal: { count: 20, time: 180, label: '普通' },
+                hard:   { count: 30, time: 120, label: '困难' },
+            },
+            4: {
+                easy:   { count: 10, time: 90,  label: '简单' },
+                normal: { count: 20, time: 60,  label: '普通' },
+                hard:   { count: 30, time: 45,  label: '困难' },
+            },
+            5: {
+                easy:   { count: 10, time: 300, label: '简单' },
+                normal: { count: 20, time: 240, label: '普通' },
+                hard:   { count: 30, time: 180, label: '困难' },
+            },
+        };
+
+        const DIFF_LABELS = { easy: '简单', normal: '普通', hard: '困难' };
+
+        /* ===== State ===== */
+        let selectedType = null;
+        let selectedDifficulty = 'normal';
+        let problems = [];
+        let userAnswers = [];
+        let timerInterval = null;
+        let timeRemaining = 0;
+        let totalTime = 0;
+        let quizStartTime = null;
+        let isOvertime = false;
+        let overtimeSeconds = 0;
+
+        /* ===== Utility ===== */
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        /* ===== Screen Management ===== */
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        /* ===== Home Screen ===== */
+        function renderTypeCards() {
+            const grid = document.getElementById('type-grid');
+            grid.innerHTML = TYPES.map((t, i) => `
+                <div class="type-card" data-index="${i}">
+                    <div class="type-icon">${t.icon}</div>
+                    <div class="type-name">${t.name}</div>
+                    <div class="type-desc">${t.desc}</div>
+                </div>
+            `).join('');
+
+            grid.addEventListener('click', (e) => {
+                const card = e.target.closest('.type-card');
+                if (!card) return;
+                const index = parseInt(card.dataset.index);
+                selectType(index);
+            });
+        }
+
+        function renderDifficultyButtons() {
+            const container = document.getElementById('difficulty-buttons');
+            container.innerHTML = Object.entries(DIFF_LABELS).map(([key, label]) => `
+                <button class="diff-btn${key === selectedDifficulty ? ' selected' : ''}" data-diff="${key}">${label}</button>
+            `).join('');
+
+            container.addEventListener('click', (e) => {
+                const btn = e.target.closest('.diff-btn');
+                if (!btn) return;
+                selectDifficulty(btn.dataset.diff);
+            });
+        }
+
+        function selectType(index) {
+            selectedType = index;
+            document.querySelectorAll('.type-card').forEach((card, i) => {
+                card.classList.toggle('selected', i === index);
+            });
+            document.getElementById('btn-start').disabled = false;
+            updateDifficultyInfo();
+        }
+
+        function selectDifficulty(diff) {
+            selectedDifficulty = diff;
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.diff === diff);
+            });
+            updateDifficultyInfo();
+        }
+
+        function updateDifficultyInfo() {
+            if (selectedType === null) return;
+            const config = DIFFICULTIES[selectedType + 1][selectedDifficulty];
+            const min = Math.floor(config.time / 60);
+            const sec = config.time % 60;
+            const timeStr = min > 0 ? `${min}分${sec > 0 ? sec + '秒' : ''}` : `${sec}秒`;
+            document.getElementById('difficulty-info').textContent =
+                `${config.count} 道题 · 限时 ${timeStr}`;
+        }
+
+        /* ===== Problem Generation ===== */
+        function generateProblems(type, count) {
+            const generators = [null, genType1, genType2, genType3, genType4, genType5];
+            return generators[type](count);
+        }
+
+        function genType1(count) {
+            const list = [], seen = new Set();
+            while (list.length < count) {
+                const a = randomInt(10, 99), b = randomInt(2, 9);
+                const key = `${a}×${b}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                list.push({ expr: `${a} × ${b}`, answer: a * b });
+            }
+            return list;
+        }
+
+        function genType2(count) {
+            const list = [], seen = new Set();
+            while (list.length < count) {
+                const a = randomInt(10, 99), b = randomInt(10, 99);
+                const op = Math.random() < 0.5 ? '+' : '-';
+                const key = `${a}${op}${b}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                list.push({ expr: `${a} ${op} ${b}`, answer: op === '+' ? a + b : a - b });
+            }
+            return list;
+        }
+
+        function genType3(count) {
+            const list = [], seen = new Set();
+            while (list.length < count) {
+                const a = randomInt(100, 999), b = randomInt(100, 999);
+                const op = Math.random() < 0.5 ? '+' : '-';
+                const key = `${a}${op}${b}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                list.push({ expr: `${a} ${op} ${b}`, answer: op === '+' ? a + b : a - b });
+            }
+            return list;
+        }
+
+        function genType4(count) {
+            const list = [], seen = new Set();
+            let attempts = 0;
+            while (list.length < count && attempts < count * 20) {
+                attempts++;
+                const divisor = randomInt(10, 99);
+                const minQ = Math.ceil(10000 / divisor);
+                const maxQ = Math.floor(99999 / divisor);
+                if (minQ > maxQ) continue;
+                const quotient = randomInt(minQ, maxQ);
+                const remainder = randomInt(0, divisor - 1);
+                const dividend = divisor * quotient + remainder;
+                if (dividend < 10000 || dividend > 99999) continue;
+                const key = `${dividend}÷${divisor}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                const firstDigit = parseInt(String(quotient)[0]);
+                list.push({ expr: `${dividend} ÷ ${divisor}`, answer: firstDigit });
+            }
+            return list;
+        }
+
+        function genType5(count) {
+            const list = [], seen = new Set();
+            let attempts = 0;
+            while (list.length < count && attempts < count * 20) {
+                attempts++;
+                const divisor = randomInt(100, 999);
+                const minQ = Math.ceil(10000 / divisor);
+                const maxQ = Math.floor(99999 / divisor);
+                if (minQ > maxQ) continue;
+                const quotient = randomInt(minQ, maxQ);
+                const remainder = randomInt(0, divisor - 1);
+                const dividend = divisor * quotient + remainder;
+                if (dividend < 10000 || dividend > 99999) continue;
+                const key = `${dividend}÷${divisor}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                const qStr = String(quotient);
+                const firstTwo = parseInt(qStr.substring(0, 2));
+                list.push({ expr: `${dividend} ÷ ${divisor}`, answer: firstTwo });
+            }
+            return list;
+        }
+
+        /* ===== Quiz ===== */
+        function startQuiz() {
+            if (selectedType === null) return;
+
+            const typeId = selectedType + 1;
+            const config = DIFFICULTIES[typeId][selectedDifficulty];
+            problems = generateProblems(typeId, config.count);
+            userAnswers = new Array(problems.length).fill('');
+            totalTime = config.time;
+            timeRemaining = config.time;
+            quizStartTime = Date.now();
+
+            renderProblems();
+            showScreen('quiz-screen');
+            startTimer();
+            updateProgress();
+
+            setTimeout(() => {
+                const first = document.querySelector('.problem-input');
+                if (first) first.focus();
+            }, 100);
+        }
+
+        function renderProblems() {
+            const type = TYPES[selectedType];
+            const container = document.getElementById('problem-list');
+            container.innerHTML = problems.map((p, i) => `
+                <div class="problem-row">
+                    <span class="problem-num">${i + 1}</span>
+                    <span class="problem-expr">${p.expr} =</span>
+                    <input type="text"
+                           class="problem-input ${type.inputClass}"
+                           id="input-${i}"
+                           inputmode="numeric"
+                           autocomplete="off"
+                           autocorrect="off"
+                           spellcheck="false"
+                           data-index="${i}">
+                </div>
+            `).join('');
+
+            // Event delegation for inputs
+            container.addEventListener('input', (e) => {
+                if (!e.target.classList.contains('problem-input')) return;
+                const idx = parseInt(e.target.dataset.index);
+                userAnswers[idx] = e.target.value;
+                updateProgress();
+            });
+
+            container.addEventListener('keydown', (e) => {
+                if (!e.target.classList.contains('problem-input')) return;
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const idx = parseInt(e.target.dataset.index);
+                    const next = document.getElementById(`input-${idx + 1}`);
+                    if (next) {
+                        next.focus();
+                    } else {
+                        submitQuiz();
+                    }
+                }
+            });
+        }
+
+        function updateProgress() {
+            const answered = userAnswers.filter(a => a.trim() !== '').length;
+            document.getElementById('progress-text').textContent = `${answered}/${problems.length}`;
+        }
+
+        /* ===== Timer ===== */
+        function startTimer() {
+            isOvertime = false;
+            overtimeSeconds = 0;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                if (isOvertime) {
+                    overtimeSeconds++;
+                    updateTimerDisplay();
+                } else {
+                    timeRemaining--;
+                    updateTimerDisplay();
+                    if (timeRemaining <= 0) {
+                        isOvertime = true;
+                        overtimeSeconds = 0;
+                        updateTimerDisplay();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const bar = document.getElementById('timer-bar');
+            const text = document.getElementById('timer-text');
+
+            bar.classList.remove('warning', 'danger', 'overtime');
+            text.classList.remove('warning', 'danger', 'overtime');
+
+            if (isOvertime) {
+                bar.style.width = '100%';
+                bar.classList.add('overtime');
+                text.classList.add('overtime');
+                text.textContent = `+${formatTime(overtimeSeconds)}`;
+            } else {
+                const pct = (timeRemaining / totalTime) * 100;
+                bar.style.width = `${pct}%`;
+                text.textContent = formatTime(timeRemaining);
+
+                if (timeRemaining <= 10) {
+                    bar.classList.add('danger');
+                    text.classList.add('danger');
+                } else if (timeRemaining <= 30) {
+                    bar.classList.add('warning');
+                    text.classList.add('warning');
+                }
+            }
+        }
+
+        /* ===== Submit & Results ===== */
+        function submitQuiz() {
+            clearInterval(timerInterval);
+
+            const correct = [], wrong = [];
+            problems.forEach((p, i) => {
+                const raw = userAnswers[i].trim();
+                const isCorrect = raw !== '' && parseInt(raw) === p.answer;
+                (isCorrect ? correct : wrong).push({
+                    index: i,
+                    expr: p.expr,
+                    userAnswer: raw,
+                    correctAnswer: p.answer,
+                });
+            });
+
+            const timeUsed = Math.floor((Date.now() - quizStartTime) / 1000);
+            const total = problems.length;
+            const pct = Math.round((correct.length / total) * 100);
+
+            // Render score card
+            let emoji = '💪', scoreClass = '';
+            if (pct === 100) { emoji = '🎉'; scoreClass = 'excellent'; }
+            else if (pct >= 80) { emoji = '👏'; }
+            else if (pct < 50) { scoreClass = 'poor'; }
+
+            const overtimeUsed = timeUsed > totalTime ? timeUsed - totalTime : 0;
+            const timeDisplay = overtimeUsed > 0
+                ? `${formatTime(timeUsed)} <span style="color:var(--danger);font-size:14px;">(超时+${formatTime(overtimeUsed)})</span>`
+                : formatTime(timeUsed);
+
+            document.getElementById('score-card').innerHTML = `
+                <div class="celebration">${emoji}</div>
+                <div class="score-main">
+                    <div class="score-number ${scoreClass}">${pct}%</div>
+                    <div class="score-main-label">正确率</div>
+                </div>
+                <div class="score-details">
+                    <div class="score-item correct">
+                        <span class="score-count">${correct.length}</span>
+                        <span class="score-item-label">正确</span>
+                    </div>
+                    <div class="score-item wrong">
+                        <span class="score-count">${wrong.length}</span>
+                        <span class="score-item-label">错误</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-count">${timeDisplay}</span>
+                        <span class="score-item-label">用时</span>
+                    </div>
+                </div>
+            `;
+
+            // Render detail list (correct first, then wrong)
+            const all = [...correct.map(d => ({ ...d, ok: true })), ...wrong.map(d => ({ ...d, ok: false }))];
+            all.sort((a, b) => a.index - b.index);
+
+            document.getElementById('result-detail').innerHTML = all.map(d => `
+                <div class="result-row ${d.ok ? 'correct' : 'wrong'}">
+                    <span class="result-num">${d.index + 1}</span>
+                    <span class="result-expr">${d.expr} =</span>
+                    <span class="result-answer">${d.userAnswer || '—'}</span>
+                    ${d.ok
+                        ? '<span class="result-icon">✓</span>'
+                        : `<span class="result-correct">正确: ${d.correctAnswer}</span>`}
+                </div>
+            `).join('');
+
+            showScreen('result-screen');
+        }
+
+        /* ===== Navigation ===== */
+        function confirmExit() {
+            if (confirm('确定要退出吗？当前进度将丢失。')) {
+                clearInterval(timerInterval);
+                showScreen('home-screen');
+            }
+        }
+
+        function retry() {
+            startQuiz();
+        }
+
+        function goHome() {
+            clearInterval(timerInterval);
+            showScreen('home-screen');
+        }
+
+        /* ===== Init ===== */
+        function init() {
+            renderTypeCards();
+            renderDifficultyButtons();
+
+            document.getElementById('btn-start').addEventListener('click', startQuiz);
+            document.getElementById('btn-back').addEventListener('click', confirmExit);
+            document.getElementById('btn-submit').addEventListener('click', submitQuiz);
+            document.getElementById('btn-retry').addEventListener('click', retry);
+            document.getElementById('btn-home').addEventListener('click', goHome);
+        }
+
+        init();
+    </script>
+</body>
+</html>
